@@ -1,0 +1,54 @@
+<project name="AntResourceCompiler" basedir="." default="help">
+
+	<target name="help">
+		<java classname="org.apache.tools.ant.Main">
+			<arg value="-projecthelp" />
+		</java>
+	</target>
+
+	<target name="clean" description="Clean build output">
+		<delete dir="./build" />
+	</target>
+
+	<target name="build" description="Comiple classes">
+		<mkdir dir="./build" />
+		<mkdir dir="./build/classes" />
+
+		<javac destdir="./build/classes" debug="true" source="1.6" target="1.6">
+			<src path="./src"/>
+			<classpath>
+				<fileset dir="./lib" includes="*.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="getgitdetails" >
+		<exec executable="git" outputproperty="git.tag">
+			<arg value="name-rev"/>
+			<arg value="--name-only"/>
+			<arg value="HEAD"/>
+		</exec>
+		<exec executable="git" outputproperty="git.revision">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+		</exec>
+	</target>
+
+	<target name="jar" description="Create Jars" depends="build,getgitdetails">
+
+		<mkdir dir="./build/tmp/" />
+		<mkdir dir="./build/jars/" />
+
+		<jar jarfile="./build/jars/ant-resource-compiler.jar">
+			<manifest>
+				<attribute name="Class-Path" value="." />
+				<attribute name="Git-Revision" value="${git.revision}" />
+				<attribute name="Implementation-Version" value="${git.tag}" />
+			</manifest>
+			<fileset dir="./build/classes" includes="**/*" />
+			<fileset dir="./src" includes="**/*.prototype" />
+		</jar>
+
+	</target>
+
+</project>

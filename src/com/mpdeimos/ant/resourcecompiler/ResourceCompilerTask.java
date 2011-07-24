@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 import java.util.Set;
 
@@ -30,14 +30,14 @@ public class ResourceCompilerTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		try {
-			URI rProtoUri = this.getClass().getResource("R.java.prototype").toURI();
-			StringPair rProto = splitFile(new File(rProtoUri));
+			InputStream rProtoIS = this.getClass().getResourceAsStream("R.java.prototype");
+			StringPair rProto = splitFile(rProtoIS);
 			
-			URI rStringUri = this.getClass().getResource("string.prototype").toURI();
-			StringPair rString = splitFile(new File(rStringUri));
+			InputStream rStringIS = this.getClass().getResourceAsStream("string.prototype");
+			StringPair rString = splitFile(rStringIS);
 			
-			URI rDrawableUri = this.getClass().getResource("drawable.prototype").toURI();
-			StringPair rDrawable = splitFile(new File(rDrawableUri));
+			InputStream rDrawableIS = this.getClass().getResourceAsStream("drawable.prototype");
+			StringPair rDrawable = splitFile(rDrawableIS);
 			
 			Properties properties = new Properties();
 			properties.load(new FileInputStream(path
@@ -91,12 +91,12 @@ public class ResourceCompilerTask extends Task {
 		}
 	}
 	
-	private static StringPair splitFile(File f)
+	private static StringPair splitFile(InputStream is)
 	{
 		StringPair r = new StringPair();
 		BufferedReader br = null;
 		try {
-			br = new BufferedReader(new FileReader(f));
+			br = new BufferedReader(new InputStreamReader(is));
 			StringBuilder sb = new StringBuilder();
 			String s;
 			while((s = br.readLine()) != null)
@@ -115,6 +115,10 @@ public class ResourceCompilerTask extends Task {
 		} finally {
 			try {
 				br.close();
+			} catch (Exception e) {
+			}
+			try {
+				is.close();
 			} catch (Exception e) {
 			}
 		}
