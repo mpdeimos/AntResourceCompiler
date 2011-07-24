@@ -1,0 +1,11 @@
+	/** image resource provider */
+	public static enum drawable implements DrawableResourceEnum
+	{
+//@@CUT@@//
+
+		@Override
+		public java.net.URL url()
+		{
+			return DrawableResourceEnum.DrawableResourceEnumResolver.url(this);
+		}
+	}

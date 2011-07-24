@@ -1,0 +1,12 @@
+	/** string resource provider */
+	public static enum string implements StringResourceEnum
+	{
+//@@CUT@@//
+
+		@Override
+		public String string()
+		{
+			return StringResourceEnum.StringResourceEnumResolver.string(this);
+		}
+	}
+

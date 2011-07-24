@@ -1,0 +1,13 @@
+package resources;
+
+/**
+ * Class for global resource access.
+ * 
+ * @author mpdeimos
+ * 
+ */
+ @SuppressWarnings("all")
+public class R
+{
+//@@CUT@@//
+}
