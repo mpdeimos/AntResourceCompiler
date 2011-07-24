@@ -30,6 +30,11 @@ public class ResourceCompilerTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		try {
+			File out = new File(path + "/resources/R.java");
+			if (out != null && out.exists() 
+					&& (System.currentTimeMillis() - out.lastModified() < 5000))
+				return;
+			
 			InputStream rProtoIS = this.getClass().getResourceAsStream("R.java.prototype");
 			StringPair rProto = splitFile(rProtoIS);
 			
