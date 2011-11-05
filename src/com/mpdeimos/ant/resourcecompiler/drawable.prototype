@@ -8,4 +8,10 @@
 		{
 			return DrawableResourceEnum.DrawableResourceEnumResolver.url(this);
 		}
+		
+		@Override
+		public String toString()
+		{
+			return url().toString();
+		}
 	}

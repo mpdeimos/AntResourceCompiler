@@ -8,5 +8,11 @@
 		{
 			return StringResourceEnum.StringResourceEnumResolver.string(this);
 		}
+		
+		@Override
+		public String toString()
+		{
+			return string();
+		}
 	}
 
