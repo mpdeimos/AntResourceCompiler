@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
@@ -31,9 +35,81 @@ public class ResourceCompilerTask extends Task {
 	public void execute() throws BuildException {
 		try {
 			File out = new File(path + "/resources/R.java");
-			if (out != null && out.exists() 
-					&& (System.currentTimeMillis() - out.lastModified() < 5000))
-				return;
+			
+			File strings = new File(path + "/string/string.properties");
+			File[] drawables = new File(path + "/drawable").listFiles(new FilenameFilter() {
+				public boolean accept(File path, String name) {
+					return name.endsWith(".png");
+				}
+			});
+			
+			// check if files were modified since last run
+			if (fileExists(out))
+			{
+				long lastCompile = out.lastModified();
+				
+				BufferedReader br = new BufferedReader(new FileReader(out));
+				
+				Collection<String> drawbleNames = new HashSet<String>();
+				boolean inDrawableEnum = false;
+				while(true)
+				{
+					String line = br.readLine();
+					
+					if (line == null)
+						break;
+					
+					if (line.startsWith("\tpublic static enum drawable"))
+					{
+						inDrawableEnum = true;
+						continue;
+					}
+					
+					if (!inDrawableEnum)
+						continue;
+					
+					if (line.startsWith("\t}"))
+					{
+						break;
+					}
+					
+					if (line.startsWith("\t\t/** "))
+					{
+						drawbleNames.add(line.substring(6, line.length()-3));
+					}
+				}
+				
+				int fileCount = 0;
+				if (fileExists(strings) && strings.lastModified() > lastCompile)
+				{
+					fileCount++;
+				}
+				for (File drawable : drawables)
+				{
+					if (fileExists(drawable) && drawable.lastModified() > lastCompile)
+					{
+						fileCount++;
+					}
+					if (drawbleNames.contains(drawable.getName()))
+					{
+						drawbleNames.remove(drawable.getName());
+					}
+					else
+					{
+						fileCount++;
+					}
+				}
+				
+				fileCount += drawbleNames.size();
+				
+				if (fileCount == 0)
+				{
+					this.log("Nothing to do. Bye.");
+					return;
+				}
+				
+				this.log(String.format("%d files modified.", fileCount));
+			}
 			
 			InputStream rProtoIS = this.getClass().getResourceAsStream("R.java.prototype");
 			StringPair rProto = splitFile(rProtoIS);
@@ -45,15 +121,11 @@ public class ResourceCompilerTask extends Task {
 			StringPair rDrawable = splitFile(rDrawableIS);
 			
 			Properties properties = new Properties();
-			properties.load(new FileInputStream(path
-					+ "/string/string.properties"));
+			properties.load(new FileInputStream(strings));
 
 			Set<Object> keySet = properties.keySet();
 			
-			String[] list = new File(path + "/drawable").list();
-			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(
-					path + "/resources/R.java"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(out));
 			
 			bw.write(rProto.pre);
 			
@@ -73,13 +145,11 @@ public class ResourceCompilerTask extends Task {
 			// writing drawable stuff
 			bw.write(rDrawable.pre);
 			
-			for (String s : list)
+			for (File d: drawables)
 			{
-				if (s.endsWith(".png"))
-				{
-					bw.write(String.format("\t\t/** %s */\n", s));
-					bw.write("\t\t"+s.substring(0, s.length()-4).toUpperCase()+",\n");
-				}
+				String s = d.getName();
+				bw.write(String.format("\t\t/** %s */\n", s));
+				bw.write("\t\t"+s.substring(0, s.length()-4).toUpperCase()+",\n");
 			}
 			
 			bw.write("\t\t;\n");
@@ -94,6 +164,11 @@ public class ResourceCompilerTask extends Task {
 		} catch (Exception e) {
 			throw new BuildException(e);
 		}
+	}
+
+	private boolean fileExists(File out)
+	{
+		return out != null && out.exists();
 	}
 	
 	private static StringPair splitFile(InputStream is)
