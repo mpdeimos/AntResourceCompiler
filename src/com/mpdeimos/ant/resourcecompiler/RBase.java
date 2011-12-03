@@ -9,6 +9,17 @@ public abstract class RBase
 {
 	/** the logger interface. */
 	private static ILogger logger;
+	
+	static
+	{
+		logger = new ILogger()
+		{
+			public void log(String message)
+			{
+				// dummy
+			}
+		};
+	}
 
 	/** sets the logger for the resource manager. */
 	protected static void setLogger(ILogger logger)

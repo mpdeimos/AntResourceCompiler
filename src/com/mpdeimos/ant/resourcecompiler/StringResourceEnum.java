@@ -28,7 +28,7 @@ public interface StringResourceEnum
 
 		/** resource bundle HashMap for strings */
 		private static final HashMap<String, ResourceBundle> resourceBundles = new HashMap<String, ResourceBundle>();
-
+		
 		/** @return the string represented by a StringResourceEnum constant. */
 		public static String string(StringResourceEnum stringEnum)
 		{
@@ -46,8 +46,7 @@ public interface StringResourceEnum
 				}
 				catch (Exception e)
 				{
-					if (RBase.getLogger() != null)
-						RBase.getLogger().log(e.getMessage());
+					RBase.getLogger().log(e.getMessage());
 					return NOT_FOUND;
 				}
 			}
@@ -65,8 +64,7 @@ public interface StringResourceEnum
 			{
 				if (str == null)
 				{
-					if (RBase.getLogger() != null)
-						RBase.getLogger().log("String not found: " + name); //$NON-NLS-1$
+					RBase.getLogger().log("String not found: " + name); //$NON-NLS-1$
 					str = NOT_FOUND;
 				}
 			}
