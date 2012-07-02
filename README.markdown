@@ -69,4 +69,4 @@ Final Notes
 * I provide the script 'as-is'. So do not expect that it will work for your project.
 * The current implementation is still raw, but does what it should do for my project. 
 * If you want to add some stuff, feel free to fork.
-* An example of how this ant script is used can be found at http://code.launchpad.net/~mpdeimos/+junk/tensor
+* An example of how this ant script is used can be found at http://code.launchpad.net/tensation
