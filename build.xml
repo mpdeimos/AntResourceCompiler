@@ -1,16 +1,30 @@
-<project name="AntResourceCompiler" basedir="." default="help">
+<project
+	xmlns:ivy="antlib:org.apache.ivy.ant"
+	name="AntResourceCompiler"
+	basedir="." 
+	default="help">
 
 	<target name="help">
 		<java classname="org.apache.tools.ant.Main">
 			<arg value="-projecthelp" />
 		</java>
 	</target>
+	
+    <target name="clean-lib" description="Clean the project libraries directory (dependencies)">
+        <delete includeemptydirs="true" dir="./lib"/>
+    </target>
 
-	<target name="clean" description="Clean build output">
+	<target name="clean-build" description="Clean build output">
 		<delete dir="./build" />
 	</target>
+	
+	<target name="clean" depends="clean-lib,clean-build" description="Cleana all"/>
+	
+    <target name="retrieve" description="Retrieve dependencies with ivy">
+    	<ivy:retrieve pattern="./lib/[artifact].[ext]" type="jar" changing="false"/>
+    </target>
 
-	<target name="build" description="Comiple classes">
+	<target name="build" depends="retrieve" description="Compile classes">
 		<mkdir dir="./build" />
 		<mkdir dir="./build/classes" />
 
@@ -50,5 +64,15 @@
 		</jar>
 
 	</target>
+	
+    <target name="publish" depends="clean, build, jar" description="Publish this project in the ivy repository">
+    	<ivy:publish artifactspattern="./build/jars/[artifact].[ext]" 
+    			           resolver="shared"
+    			           pubrevision="latest" 
+    			           status="release"
+    					   overwrite="true"
+    	/>
+        <echo message="Released with version ${git.revision}" />
+    </target>
 
 </project>

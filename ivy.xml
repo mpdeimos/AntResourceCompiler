@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="1.0">
+    <info organisation="com.mpdeimos" module="ant-resource-compiler" status="release" revision="1.0">
+    </info>
+    <publications>
+      <artifact name="ant-resource-compiler" type="jar" />
+    </publications>
+    <dependencies>
+    	<dependency org="ant" name="ant" rev="1.7.0" transitive="true">
+    		<exclude module="ant.+"/>
+    		<exclude module="(?!ant).+"/>
+    	</dependency>
+    </dependencies>
+</ivy-module>
